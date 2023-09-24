@@ -26,4 +26,5 @@ In addition to this GitHub site, we will be using a few other resources this yea
 
 <br/>
 <!-- markdownlint-enable MD033 -->
+
 - **Zoom** will be used for video conferencing. This will allow us to share our screens with each other. Also, if you are unable to attend in person, Zoom will enable you to attend remotely if you want to. The URL for the Zoom meetings will be in a calendar invitation I will send out soon.
