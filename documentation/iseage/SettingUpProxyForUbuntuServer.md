@@ -1,7 +1,7 @@
 # Connecting to the outside world from ISEAGE
 
 > Instructions written by Aksel Rasmussen on 2023-10-14
-> Last updated by Aksel Rasmussen on 2023-10-21
+> Last updated by Aksel Rasmussen on 2023-10-21 at 11:44
 
 > NOTE: These instructions are for use with a fresh ubuntu server with no modifications.
 > If you have any issues outside of that, that's your fault.
@@ -33,4 +33,10 @@
 	```
 6) Run `sudo netplan apply`
 7) Restart the machine
-8) Verify everything is working by running `sudo apt update`.
+8) `apt` and `curl` should now be working.
+	Verify this by running `sudo apt update` and `curl google.com` respectively.
+
+> Currently known issues:
+> - `dig` isn't working
+> - `nslookup` isn't working
+> - `named` can't forward its requests
