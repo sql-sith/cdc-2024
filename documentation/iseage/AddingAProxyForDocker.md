@@ -13,7 +13,7 @@ In this document we will cover setting up docker to work though the WiErd and St
  	```
  3) Add the proxy info to the above file (root):  
 	(Add these lines to it:)
-	```
+	```ini
  	[Service]
 	Environment="HTTP_PROXY=http://199.100.16.100:3128"
 	Environment="HTTPS_PROXY=http://199.100.16.100:3128"
