@@ -41,7 +41,7 @@ In this document we will cover setting up docker to work though the WiErd and St
 	   "default": {
 	     "httpProxy": "http://199.100.16.100:3128",
 	     "httpsProxy": "http://199.100.16.100:3128",
-	     "noProxy": "localhost,127.0.0.1,docker-registry.example.com,.corp"
+	     "noProxy": "localhost,127.0.0.1"
 	   }
 	 }
 	}
