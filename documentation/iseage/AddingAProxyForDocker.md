@@ -17,7 +17,7 @@ In this document we will cover setting up docker to work though the WiErd and St
  	[Service]
 	Environment="HTTP_PROXY=http://199.100.16.100:3128"
 	Environment="HTTPS_PROXY=http://199.100.16.100:3128"
-	Environment="NO_PROXY=localhost,127.0.0.1,docker-registry.example.com,.corp"
+	Environment="NO_PROXY=localhost,127.0.0.1"
  	```
  4) Restart docker (root):
 	```sh
