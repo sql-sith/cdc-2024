@@ -106,8 +106,7 @@ What I like about your answers is that, taken together, they point out the follo
 > dash is the standard command interpreter for the system.  The current version of dash is in the process of being changed to conform with the POSIX 1003.2 and 1003.2a specifications for the shell.  This version has many features which make it appear similar in some respects to the Korn shell, but it is not a Korn shell clone (see ksh(1)).  Only features designated by POSIX, plus a few Berkeley extensions, are being incorporated into this shell.  This man page is not intended to be a tutorial or a complete specification of the shell.
 > ```
 >
-
-The reason for the confusion is that the default shell for a _user_ in macOS is `zsh`, and the default _user_ shell in Ubuntu is `bash`. But if a script wants to be run by the system shell, it will be run by `bash` in macOS, and `dash` in Ubuntu. Isn't life weird?
+> The reason for the confusion is that the default shell for a _user_ in macOS is `zsh`, and the default _user_ shell in Ubuntu is `bash`. But if a script wants to be run by the system shell, it will be run by `bash` in macOS, and `dash` in Ubuntu. Confused yet?
 
 ### Back to the question, "What is a shell?"
 
@@ -131,9 +130,10 @@ This section will have user comments and post-meeting notes mixed together.
   - scripting
 
     _NOTE: The definition of "wizardry" expanded over time to include any kind of programming, because people who can code look a lot like magicians to people who can't._
-<br/>
+    `<br/>`
 - Dan: is still hungry and talking about tacos
 - Chris: file management
+
   - crud (create, read, update, delete), and untrash
   - access control/permissions
 - Dan: launching files
@@ -142,6 +142,7 @@ This section will have user comments and post-meeting notes mixed together.
   - compiled programs
   - debugging
 - Michael: confusing young children
+
   - *For the record, I usually **trust** Eagle Scouts*
 - Tristan: managing and customizing an OS
 
@@ -154,9 +155,9 @@ This section will have user comments and post-meeting notes mixed together.
   - Job management
   - Pipelining
   - Scheduling
-  
+
     _NOTE: This isn't exactly what Dan was after, but I had trouble capturing his ideas in a bullet point. He was pointing out how shells can be used to take complicated, multi-step processes and make them seem simpler._
-<br/>
+    `<br/>`
 
 ## `PowerShell` vs `bash`
 
@@ -254,22 +255,22 @@ root@palo:~# echo $$
 # instead and `bash` will substitute the current process ID where `$$` appears.
 
 root@palo:~# cat /proc/63087/limits
-Limit                     Soft Limit           Hard Limit           Units     
+Limit                     Soft Limit           Hard Limit           Units   
 Max cpu time              unlimited            unlimited            seconds   
-Max file size             unlimited            unlimited            bytes     
-Max data size             unlimited            unlimited            bytes     
-Max stack size            8388608              unlimited            bytes     
-Max core file size        0                    0                    bytes     
-Max resident set          unlimited            unlimited            bytes     
+Max file size             unlimited            unlimited            bytes   
+Max data size             unlimited            unlimited            bytes   
+Max stack size            8388608              unlimited            bytes   
+Max core file size        0                    0                    bytes   
+Max resident set          unlimited            unlimited            bytes   
 Max processes             15332                15332                processes 
-Max open files            1024                 1048576              files     
-Max locked memory         512180224            512180224            bytes     
-Max address space         unlimited            unlimited            bytes     
-Max file locks            unlimited            unlimited            locks     
+Max open files            1024                 1048576              files   
+Max locked memory         512180224            512180224            bytes   
+Max address space         unlimited            unlimited            bytes   
+Max file locks            unlimited            unlimited            locks   
 Max pending signals       15332                15332                signals   
-Max msgqueue size         819200               819200               bytes     
-Max nice priority         0                    0                    
-Max realtime priority     0                    0                    
+Max msgqueue size         819200               819200               bytes   
+Max nice priority         0                    0                  
+Max realtime priority     0                    0                  
 Max realtime timeout      unlimited            unlimited            us 
 
 ```
