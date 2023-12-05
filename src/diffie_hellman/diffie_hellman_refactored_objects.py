@@ -15,7 +15,6 @@
     6. The values for key calculated by Alice and Bob are identical.
     6. Assuming Alice made good choices for g and p, it is not feasible
        for Eve to determine the value of key quickly enough to be useful.
-
 """
 
 from math import gcd
@@ -24,6 +23,7 @@ from calutils.strings import get_int_from_console
 from primePy.primes import check as is_prime
 from textwrap import fill, indent
 
+# region constants
 MIN_PRIME = 10**4 - 1
 MAX_PRIME = 10**50 - 1
 MIN_GENERATOR = 2
@@ -34,22 +34,74 @@ INDENT_WIDTH = 100
 INDENT_PREFIX = '  | '
 
 EVALUATE_INPUT_QUALITY = True
-# EVALUATE_SMALL_NUMBER_THRESHOLD: int = 1000000
+# endregion
 
 
 class Person(object):
     _name: str
+    _partner_name: str
     _data: dict
 
-    def __init__(self, name):
+    def __init__(self, name, partner_name):
         self._name = name
+        self._partner_name = partner_name
         self._data = {}
 
-    def store_data(self, key: str, value: any) -> None:
+    def inform_everyone(self, key: str, value: any, scope_by_owner: bool = False) -> None:
+        print("")
+        for person in persons:
+            if person is not self:
+                suffix = f".{self._name}" if scope_by_owner else None
+                person.store_data(key, value, suffix)
+                msg = f"{person.get_name()} has learned that {key} has the value {value}."
+                print(indented_text(msg=msg, indent_width=INDENT_WIDTH, indent_prefix=INDENT_PREFIX))
+
+    def choose_named_value(
+            self, name: str, prompt: str = None, min_value: int = 1, max_value: int = 10,
+            is_public: bool = False, scope_by_owner: bool = False) -> int:
+
+        if not prompt:
+            # todo: add logic to include min and/or max values if provided
+            prompt = f"Please enter a value for {name}:\n> "
+
+        value = get_int_from_console(
+            prompt,
+            min_value,
+            max_value)
+        print(value)
+        self.store_data(name, value)
+        if is_public:
+            self.inform_everyone(name, value, scope_by_owner=scope_by_owner)
+
+        return value
+
+    def generate_public_key(self):
+        g = self.get_data("g")
+        p = self.get_data("p")
+        private_key = self.get_data("private_key")
+
+        public_key = (g ** private_key) % p
+        self.store_data(f"public_key.{self.get_name()}", public_key)
+        self.inform_everyone(f"public_key.{self.get_name()}", public_key, scope_by_owner=True)
+
+    def calculate_shared_secret(self):
+        secret = ((
+            self.get_data("public_key", scope_suffix=self._partner_name) ** self.get_data("private_key")) %
+                 self.get_data("p"))
+        self.store_data("secret", secret)
+
+    def store_data(self, key: str, value: any, scope_suffix: str = None) -> None:
+        if scope_suffix:
+            key = f"{key}.{scope_suffix}"
         self._data[key] = value
 
-    def get_data(self, key: str) -> any:
+    def get_data(self, key: str, scope_suffix: str = None) -> any:
+        if scope_suffix:
+            key = f"{key}.{scope_suffix}"
         return self._data[key]
+
+    def get_all_data(self) -> dict:
+        return self._data
 
     def get_sorted_data_keys(self) -> list:
         return sorted(self._data)
@@ -57,7 +109,7 @@ class Person(object):
     def get_name(self) -> str:
         return self._name
 
-    def tell_all(self) -> None:
+    def tell_us_everything(self) -> None:
         print(f"\nHi, my name is {self.get_name()}. Thanks for having me. Here's everything I know.")
 
         for item in self.get_sorted_data_keys():
@@ -70,14 +122,6 @@ def show_welcome_message() -> None:
           "each private key when prompted. From these, Python will calculate the"\
           "public keys and the shared secret and will display the results for you."
     print(indented_text(msg=msg, indent_width=INDENT_WIDTH))
-
-
-def tell_everyone(key: str, value: any) -> None:
-    print("")
-    for person in persons:
-        person.store_data(key, value)
-        msg = f"{person.get_name()} has learned that {key} has the value {value}."
-        print(indented_text(msg=msg, indent_width=INDENT_WIDTH, indent_prefix=INDENT_PREFIX))
 
 
 def indented_text(msg: str, indent_width: int, indent_prefix: str = None) -> str:
@@ -140,7 +184,6 @@ def evaluate_diffie_hellman_seeds(p: int, g: int) -> None:
                 msg = "Neither p nor g are prime, and they are not co-prime. We'll "\
                       "continue, just to humor you."
                 print(indented_text(msg=msg, indent_width=INDENT_WIDTH, indent_prefix=INDENT_PREFIX))
-                print(msg)
             case 1:
                 msg = "You got one prime number at least. Greet your million Shakespeare monkeys "\
                       "monkeys for me when you get home."
@@ -166,68 +209,55 @@ def evaluate_diffie_hellman_seeds(p: int, g: int) -> None:
     print("")
 
 
-def alice_chooses_public_seeds_g_and_p():
-    p = get_int_from_console(
-        f"\nEnter a value for p (min: {MIN_PRIME}; max: {MAX_PRIME}):\n> ",
-        MIN_PRIME, MAX_PRIME)
-    g = get_int_from_console(
-        f"\nEnter a value for p (min: {MIN_GENERATOR}; max: {MAX_GENERATOR}):\n> ",
-        MIN_GENERATOR, MAX_GENERATOR)
+def alice_chooses_g_and_p():
+    _ = alice.choose_named_value(
+        name="p",
+        prompt=f"\nEnter a value for p (min: {MIN_PRIME}; max: {MAX_PRIME}):\n> ",
+        min_value=MIN_PRIME,
+        max_value=MAX_PRIME,
+        is_public=True,
+        scope_by_owner=False)
 
-    if EVALUATE_INPUT_QUALITY:
-        evaluate_diffie_hellman_seeds(p, g)
-
-    # share these values publicly:
-    tell_everyone("g", g)
-    tell_everyone("p", p)
-
-
-def alice_chooses_private_key_a_and_calculates_public_key_a():
-    private_key_a = get_int_from_console(
-        f"\nEnter a value for private_key_a (min: {MIN_PRIVATE_KEY}; max: {MAX_PRIVATE_KEY}):\n> ",
-        MIN_PRIVATE_KEY, MAX_PRIVATE_KEY)
-    alice.store_data("private_key_a", private_key_a)
-
-    g = alice.get_data("g")
-    p = alice.get_data("p")
-
-    public_key_a = (g ** private_key_a) % p
-    tell_everyone("public_key_a", public_key_a)
+    _ = alice.choose_named_value(
+        name="g",
+        prompt=f"\nEnter a value for g (min: {MIN_GENERATOR}; max: {MAX_GENERATOR}):\n> ",
+        min_value=MIN_GENERATOR,
+        max_value=MAX_GENERATOR,
+        is_public=True,
+        scope_by_owner=False)
 
 
-def bob_chooses_private_key_b_and_calculates_public_key_b():
-    private_key_b = get_int_from_console(
-        f"\nEnter a value for private_key_b (min: {MIN_PRIVATE_KEY}; max: {MAX_PRIVATE_KEY}):\n> ",
-        MIN_PRIVATE_KEY, MAX_PRIVATE_KEY)
-    bob.store_data("private_key_b", private_key_b)
-
-    g = bob.get_data("g")
-    p = bob.get_data("p")
-
-    public_key_b = (g ** private_key_b) % p
-    tell_everyone("public_key_b", public_key_b)
+def choose_private_keys():
+    for person in (alice, bob):
+        _ = person.choose_named_value(
+            name="private_key",
+            prompt="Please enter a 5-digit private key.\n> ",
+            min_value=MIN_PRIVATE_KEY,
+            max_value=MAX_PRIVATE_KEY,
+            is_public=False
+        )
 
 
-def alice_calculates_the_shared_secret():
-    secret = (alice.get_data("public_key_b") ** alice.get_data("private_key_a")) % alice.get_data("p")
-    alice.store_data("secret", secret)
+def generate_public_keys():
+    for person in (alice, bob):
+        person.generate_public_key()
 
 
-def bob_calculates_the_shared_secret():
-    secret = (bob.get_data("public_key_a") ** bob.get_data("private_key_b")) % bob.get_data("p")
-    bob.store_data("secret", secret)
+def calculate_shared_secrets():
+    for person in (alice, bob):
+        person.calculate_shared_secret()
 
 
-def eve_is_like_whatever():
-    eve.store_data("her darkest dream", "that they won't get away with this")
+def eve_is_like_this_is_fine():
+    eve.store_data("_her darkest dream_", "that they won't get away with this")
 
 
-def show_what_everyone_knows() -> None:
+def what_did_everyone_learn_today() -> None:
     for person in persons:
-        person.tell_all()
+        person.tell_us_everything()
 
     print("\nBottom line:")
-    msg = f"   Bob calculated a secret of {bob.get_data('secret')}, and"
+    msg = f" Bob   calculated a secret of {bob.get_data('secret')}, and"
     print(indented_text(msg=msg, indent_prefix=INDENT_PREFIX, indent_width=INDENT_WIDTH))
     msg = f" Alice calculated a secret of {alice.get_data('secret')}."
     print(indented_text(msg=msg, indent_prefix=INDENT_PREFIX, indent_width=INDENT_WIDTH))
@@ -235,16 +265,21 @@ def show_what_everyone_knows() -> None:
 
 
 if __name__ == "__main__":
-    alice = Person(name="Alice")
-    bob = Person(name="Bob")
-    eve = Person(name="Eve")
+    alice = Person(name="Alice", partner_name="Bob")
+    bob = Person(name="Bob", partner_name="Bob")
+    eve = Person(name="Eve", partner_name="The KGB")
     persons = [alice, bob, eve]
 
     show_welcome_message()
-    alice_chooses_public_seeds_g_and_p()
-    alice_chooses_private_key_a_and_calculates_public_key_a()
-    bob_chooses_private_key_b_and_calculates_public_key_b()
-    alice_calculates_the_shared_secret()
-    bob_calculates_the_shared_secret()
-    eve_is_like_whatever()
-    show_what_everyone_knows()
+
+    alice_chooses_g_and_p()
+
+    if EVALUATE_INPUT_QUALITY:
+        evaluate_diffie_hellman_seeds(alice.get_data("p"), alice.get_data("g"))
+
+    choose_private_keys()
+    generate_public_keys()
+    calculate_shared_secrets()
+
+    eve_is_like_this_is_fine()
+    what_did_everyone_learn_today()
