@@ -80,14 +80,14 @@ What I like about your answers is that, taken together, they point out the follo
 >
 > Notice that line 3 begins with the words `GNU bash`. That's right, the default shell on macOS is, in fact, shell that our hypothetical macOS user just threw shade at as an obscure, Neandarthal menace: `bash`.
 >
-> If you try the same syntax on `Ubuntu`, you get an error:
+> If you try the same syntax on `Ubuntu`, you get_data an error:
 >
 > ```bash
 > chris@caerdydd:~$ sh --version
 > sh: 0: Illegal option --
 > ```
 >
-> Rather than try to get this program to tell us its version, the better way to do this is to use the `man` pages. Below I have listed first part of the output from `man sh` on Ubuntu. Notice that the shell name is `dash `. The `dash` shell is faster than `bash` at certain low-level operations, and is used by many, if not all, Debian-based Linux distributions.
+> Rather than try to get_data this program to tell us its version, the better way to do this is to use the `man` pages. Below I have listed first part of the output from `man sh` on Ubuntu. Notice that the shell name is `dash `. The `dash` shell is faster than `bash` at certain low-level operations, and is used by many, if not all, Debian-based Linux distributions.
 >
 > ```bash
 > chris@caerdydd:~$ man sh
@@ -214,7 +214,7 @@ root@palo:~# ls -l /dev/sda3
 brw-rw---- 1 root disk 8, 3 Nov  9 22:35 /dev/sda3
 
 # Why, it's a file! :) It's type is 'b' (that's the first column). 'b' means it's a 
-# "block special" file. disks store data in blocks, so that makes sense. You can think
+# "block special" file. disks store_data data in blocks, so that makes sense. You can think
 # of this file as something similar to a device driver in Windows.
 
 # Demo 2: Working with terminals
@@ -231,7 +231,7 @@ root@palo:~# ls -l /dev/pts/1
 crw------- 1 root tty 136, 1 Nov 18 17:02 /dev/pts/1
 
 # This one is a character special file (type c). # Since it's my terminal, what happens
-# if I write to it? Will it just get redirected to my screen?
+# if I write to it? Will it just get_data redirected to my screen?
 
 root@palo:~# echo Will this show up on my screen? >> /dev/pts/1
 Will this show up on my screen?
