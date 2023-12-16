@@ -78,16 +78,16 @@ What I like about your answers is that, taken together, they point out the follo
 > There is NO WARRANTY, to the extent permitted by law.
 > ```
 >
-> Notice that line 3 begins with the words `GNU bash`. That's right, the default shell on macOS is, in fact, shell that our hypothetical macOS user just threw shade at as an obscure, Neandarthal menace: `bash`.
+> Notice that line 3 begins with the words `GNU bash`. That's right, the default shell on macOS is, in fact, the same shell that our hypothetical macOS user just threw shade at as an obscure, Neandarthal menace: `bash`.
 >
-> If you try the same syntax on `Ubuntu`, you get_data an error:
+> If you try the same syntax on `Ubuntu`, you get an error:
 >
 > ```bash
 > chris@caerdydd:~$ sh --version
 > sh: 0: Illegal option --
 > ```
 >
-> Rather than try to get_data this program to tell us its version, the better way to do this is to use the `man` pages. Below I have listed first part of the output from `man sh` on Ubuntu. Notice that the shell name is `dash `. The `dash` shell is faster than `bash` at certain low-level operations, and is used by many, if not all, Debian-based Linux distributions.
+> Rather than try to get this program to tell us its version, the better way to do this is to use the `man` pages. Below I have listed first part of the output from `man sh` on Ubuntu. Notice that the shell name is `dash `. The `dash` shell is faster than `bash` at certain low-level operations, and is used by many, if not all, Debian-based Linux distributions.
 >
 > ```bash
 > chris@caerdydd:~$ man sh
@@ -106,14 +106,14 @@ What I like about your answers is that, taken together, they point out the follo
 > dash is the standard command interpreter for the system.  The current version of dash is in the process of being changed to conform with the POSIX 1003.2 and 1003.2a specifications for the shell.  This version has many features which make it appear similar in some respects to the Korn shell, but it is not a Korn shell clone (see ksh(1)).  Only features designated by POSIX, plus a few Berkeley extensions, are being incorporated into this shell.  This man page is not intended to be a tutorial or a complete specification of the shell.
 > ```
 >
-> The reason for the confusion is that the default shell for a _user_ in macOS is `zsh`, and the default _user_ shell in Ubuntu is `bash`. But if a script wants to be run by the system shell, it will be run by `bash` in macOS, and `dash` in Ubuntu. Confused yet?
+> The reason for the confusion is that the default shell for a _user_ in macOS is `zsh`, and the default shell for a _user_ in Ubuntu is `bash`. But if a script runs under the system shell, meaning `/bin/sh`, it will run under `bash `in macOS, and `dash` in Ubuntu. Confused yet?
 
 ### Back to the question, "What is a shell?"
 
 I didn't answer the question. I thought since I'd been thinking about it for half a week, it might not be fair. But we did present Bard and Bing/ChatGPT (in creative mode) the following prompt: "Hi, (Bard|Bing)! It's Chris. How would you define an operating system shell, at a high school senior level, in one brief paragraph?"
 
 - Bard: An operating system shell is a software interface that acts as a bridge between a user and the core of an operating system. It enables users to control and interact with the system by interpreting commands entered in a text-based or graphical environment. Think of it as the command center of your computer, allowing you to manage files, launch programs, and configure system settings.
-- ChatGPT: An operating system shell is a program that allows you to communicate with the operating system and use its services. You can type commands or click icons to tell the operating system what you want to do, such as creating, deleting, or moving files, running other programs, or changing settings. The shell is the outermost layer of the operating system, because it is the part that you see and interact with. [Different operating systems may have different types of shells, such as command-line shells or graphical shells](https://en.wikipedia.org/wiki/Shell_%28computing%29)
+- ChatGPT: An operating system shell is a program that allows you to communicate with the operating system and use its services. You can type commands or click icons to tell the operating system what you want to do, such as creating, deleting, or moving files, running other programs, or changing settings. The shell is the outermost layer of the operating system, because it is the part that you see and interact with. Different operating systems may have different types of shells, such as [command-line shells or graphical shells](https://en.wikipedia.org/wiki/Shell_%28computing%29)
 
 These are pretty good answers. ChatGPT even gave examples of different things that shells can do, which took some of the fun out of my next question...
 
@@ -269,8 +269,8 @@ Max address space         unlimited            unlimited            bytes
 Max file locks            unlimited            unlimited            locks   
 Max pending signals       15332                15332                signals   
 Max msgqueue size         819200               819200               bytes   
-Max nice priority         0                    0                  
-Max realtime priority     0                    0                  
+Max nice priority         0                    0              
+Max realtime priority     0                    0              
 Max realtime timeout      unlimited            unlimited            us 
 
 ```
