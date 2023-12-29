@@ -25,11 +25,11 @@ from primePy.primes import check as is_prime
 from textwrap import fill, indent
 
 MIN_PRIME = 10**4 - 1
-MAX_PRIME = 10**20 - 1
+MAX_PRIME = 10**50 - 1
 MIN_GENERATOR = 2
-MAX_GENERATOR = 11
-MIN_PRIVATE_KEY = 10**6 - 1
-MAX_PRIVATE_KEY = 10**10 - 1
+MAX_GENERATOR = 10**20 - 1
+MIN_PRIVATE_KEY = 10**4 - 1
+MAX_PRIVATE_KEY = 10**15 - 1
 INDENT_WIDTH = 100
 INDENT_PREFIX = '  | '
 
