@@ -7,14 +7,21 @@
     `bash-is-fun-01.sh` include:
 
         -   Parsing for two command-line flags:
-            o   --debug will print a couple of side-by-side hex and ascii data dumps
-                at useful times
-            o   --trace will turn on `-x` (xtrace) so that bash will print (a
-                representation of) every command before it is executed.
+            o   the --debug flag will print a couple of side-by-side hex and 
+                ascii data dumps at useful times
+            o   the --trace will turn on `-x` (xtrace) so that bash will print
+                (a representation of) every command before it is executed.
         -   The use of bash's arrays. This feature is specific to bash, and is not
             guaranteed to be available using the same syntax in other shells.
-        -   Those arrays allow me to use options with the `select` command that have 
-            whitespace in them. There may be other ways to do this.
+            o   this is for you, henry. :)
+            o   an indexed array is used to hold "yes" and "no" as possible options 
+                for the `select` menu that asks the user if they'd like to repeat
+                the program. an indexed array uses arbitrary integers as the index.
+            o   an associative array is used to hold the possible options for sort
+                order. an associative array can use arbitrary strings as the index.
+                this allows me to associate each sort order with its sort information.
+                so the array knows that the "filename" sort is on my temp file's first
+                column, for example.
 
     Description:
         This script displays a filtered and sorted list of files in the current directory.
@@ -32,7 +39,6 @@ end_comment
 
 
 # parameter parsing:
-
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -d|--debug) debug=1 ;;
@@ -51,7 +57,22 @@ done
 FILENAME_DELIMITER=$'\01'
 
 MESSAGE_BAD_CHOICE="Option; please it bad! Again try above."
-OPTIONS_FILE_SORT=("Filename" "Filename Length" "Filename Vowel Count")
+
+# OPTIONS_FILE_SORT=("Filename" "Filename Length" "Filename Vowel Count")
+declare -A OPTIONS_FILE_SORT
+OPTIONS_FILE_SORT["Filename"]="1"
+OPTIONS_FILE_SORT["Filename Length"]="2h"
+OPTIONS_FILE_SORT["Filename Vowel Count"]="3h"
+
+ # make sure we don't match on substring or regex:
+if [[ $debug == 1 ]]; then 
+    OPTIONS_FILE_SORT["Vowel"]="1r";
+    OPTIONS_FILE_SORT["e"]="2r"
+    OPTIONS_FILE_SORT[" "]="3r"
+    OPTIONS_FILE_SORT["."]="1h"
+    OPTIONS_FILE_SORT[".*"]="1hr"
+fi
+
 OPTIONS_FILE_SORT_BREAK="^(Filename|Filename Length|Filename Vowel Count)$"
 
 OPTIONS_YESNO=("Yes" "No")
@@ -97,8 +118,9 @@ while [[ true ]]; do
     echo ""
     echo "$PROMPT_FILE_SORT"
 
-    select opt in "${OPTIONS_FILE_SORT[@]}"; do
+    select opt in "${!OPTIONS_FILE_SORT[@]}"; do
         if [[ "$opt" =~ $OPTIONS_FILE_SORT_BREAK ]]; then
+            sort_key=${OPTIONS_FILE_SORT[$opt]}
             break
         else
             echo "$MESSAGE_BAD_CHOICE"
@@ -122,37 +144,6 @@ while [[ true ]]; do
 
             echo -e "$base_filename${FILENAME_DELIMITER}$filename_length${FILENAME_DELIMITER}$vowel_count" >> "$tmpfile"
         done
-
-        # The way to do this without hard-coded strings uses bash associative arrays.
-        # I was going to leave that for another day but since Henry worked with bash 
-        # arrays in his solution, please see `bash-has-arrays.sh` in this folder to
-        # see how that works.
-        if [[ "$opt" == "Filename" ]]; then
-            sort_key="1"
-        elif [[ "$opt" == "Filename Length" ]]; then
-            sort_key="2h"
-        elif [[ "$opt" == "Filename Vowel Count" ]]; then
-            sort_key="3h"
-        else
-            # You really would want to code this `else` clause, so that if you added another
-            # option, or there was an error that let this "impossible" situation occur, you'd
-            # at least communicate _something_ to the user. At my first job, I put this in as
-            # the default error response, meaning the message we displayed when there was no
-            # specific message defined for an error:
-            #
-            #   CONGRATULATIONS!!! You have won a free trip to Hawaii!
-            #   Contact the ADP Help Desk for more info.
-            #
-            # It did happen, and the user was pretty disappointed, but at least they actually
-            # called the Help Desk so we knew that we had an unhandled error in our code. :)
-
-            msg=$(fortune)
-            msg+="\n\n"
-            msg+="Did you bad a bad thing at. Script you get my out you of. Thank you."
-            echo -e $msg >&2
-            set +x
-            exit 1
-        fi
 
         if [[ $debug == 1 ]]; then
             echo ""
