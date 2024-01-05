@@ -4,24 +4,34 @@
 
     This version of my script has some intermediate techniques in it. Please ask if you 
     want me to review what any of them do or how they work. Some of the changes from
-    `bash-is-fun-01.sh` include:
+    `bash-is-fun.sh` include:
 
         -   Parsing for two command-line flags:
-            o   the --debug flag will print a couple of side-by-side hex and 
-                ascii data dumps at useful times
-            o   the --trace will turn on `-x` (xtrace) so that bash will print
-                (a representation of) every command before it is executed.
-        -   The use of bash's arrays. This feature is specific to bash, and is not
+            o   The --debug flag will print a couple of side-by-side hex and ascii data
+                dumps at useful times.
+            o   The --trace will turn on `-x` (xtrace) so that bash will print (a
+                representation of) every command before it is executed.
+        -   The use of bash's' arrays. This feature is specific to bash, and is not
             guaranteed to be available using the same syntax in other shells.
-            o   this is for you, henry. :)
-            o   an indexed array is used to hold "yes" and "no" as possible options 
-                for the `select` menu that asks the user if they'd like to repeat
-                the program. an indexed array uses arbitrary integers as the index.
-            o   an associative array is used to hold the possible options for sort
-                order. an associative array can use arbitrary strings as the index.
-                this allows me to associate each sort order with its sort information.
-                so the array knows that the "filename" sort is on my temp file's first
+            o   This is for you, henry. :)
+            o   An indexed array is used to hold "yes" and "no" as possible options for
+                the `select` menu that asks the user if they'd like to repeat the
+                program. an indexed array uses arbitrary integers as the index.
+            o   An associative array is used to hold the possible options for sort order.
+                an associative array can use arbitrary strings as the index. this allows
+                you to associate each sort order with its sort information. for example,
+                so the array knows that the "filename" sort is on the temp file's first
                 column, for example.
+        -   I've moved user-facing strings into variables, except for messages in debug
+            code. This is a good practice for a couple of reasons.
+            o   It makes it easier to change the text of a message that's used in
+                multiple places, because you only have to change it in one place.
+            o   In production programming, strings are frequently moved into a separate
+                file, so that different languages can be supported without changing the
+                program itself. This process is called "internationalization" or "i18n."
+                Separating strings into variables is the first step in this process. The
+                next step would be to read the variables from a resource file containing 
+                translations of the strings in the user's preferred language.
 
     Description:
         This script displays a filtered and sorted list of files in the current directory.
@@ -43,7 +53,8 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -d|--debug) debug=1 ;;
         -t|--trace) set -x ;;
-        *) echo "Unknown parameter passed: $1"; set +x; exit 3 ;;
+        -u|--nounset) set -u ;;
+        *) echo "Unknown parameter passed: $1. Program exiting."; exit 3 ;;
     esac
     shift
 done
@@ -56,49 +67,59 @@ done
 # although this is a legal character for a filename, I've never seen it used in a filename.
 FILENAME_DELIMITER=$'\01'
 
-MESSAGE_BAD_CHOICE="Option; please it bad! Again try above."
+# general metadata:
+PROGRAM_NAME="$(basename ${0})"
 
-# OPTIONS_FILE_SORT=("Filename" "Filename Length" "Filename Vowel Count")
-declare -A OPTIONS_FILE_SORT
-OPTIONS_FILE_SORT["Filename"]="1"
-OPTIONS_FILE_SORT["Filename Length"]="2h"
-OPTIONS_FILE_SORT["Filename Vowel Count"]="3h"
-
- # make sure we don't match on substring or regex:
-if [[ $debug == 1 ]]; then 
-    OPTIONS_FILE_SORT["Vowel"]="1r";
-    OPTIONS_FILE_SORT["e"]="2r"
-    OPTIONS_FILE_SORT[" "]="3r"
-    OPTIONS_FILE_SORT["."]="1h"
-    OPTIONS_FILE_SORT[".*"]="1hr"
-fi
-
-OPTIONS_FILE_SORT_BREAK="^(Filename|Filename Length|Filename Vowel Count)$"
-
+# generic yes/no options for `select` menus:
 OPTIONS_YESNO=("Yes" "No")
 OPTIONS_YESNO_BREAK="^(Yes)$"
 OPTIONS_YESNO_EXIT="^(No)$"
 
-PROMPT_CONTINUE="Again continue go to which for more for? Guess. "
-PROMPT_FILE_SORT="Us which field you data by sorting the files the screen onto be wanting to be? Tell. "
-PROMPT_FILTER="By what string with which filtering the files this directory in? Type. "
-PROMPT_FILTER_REPRIMAND="Not empty enter! Type right which filtering by here directory files in! Now. "
+# string to filter files:
+OPTIONS_FILTER_PROMPT="What string should be used to filter the files? "
+OPTIONS_FILTER_PROMPT_REPRIMAND="Invalid filter string entered. Try again. "
+
+# options for sorting files:
+OPTIONS_SORT_PROMPT="Which field should be used to sort the files? "
+
+declare -A OPTIONS_SORT
+OPTIONS_SORT["Filename"]="1"
+OPTIONS_SORT["Filename Length"]="2h"
+OPTIONS_SORT["Filename Vowel Count"]="3h"
+OPTIONS_SORT_BREAK="^(Filename|Filename Length|Filename Vowel Count)$"
+
+# having a --debug flag allows you to do diagnositics or testing only when that flag is set.
+# in debug mode only, make sure we don't match on substring or regex:
+if [[ $debug == 1 ]]; then 
+    OPTIONS_SORT["Vowel"]="1r";
+    OPTIONS_SORT["e"]="2r"
+    OPTIONS_SORT[" "]="3r"
+    OPTIONS_SORT["."]="1h"
+    OPTIONS_SORT[".*"]="1hr"
+fi
+
+# prompt to continue or exit:
+OPTIONS_CONTINUE_PROMPT="Would you like to run the program again? "
 
 OUTPUT_HEADERS="Filename${FILENAME_DELIMITER}Filename Length${FILENAME_DELIMITER}Filename Vowel Count\n"
 OUTPUT_HEADERS+="--------${FILENAME_DELIMITER}---------------${FILENAME_DELIMITER}--------------------\n"
 
+# general-use messages:
+MESSAGE_BAD_CHOICE="Invalid choice ($opt)."
+MESSAGE_WELCOME="Welcome to ${PROGRAM_NAME}!\n"
+MESSAGE_WELCOME+="Thanks for stopping by."
+MESSAGE_NO_FILES_FOUND="No matching files found."
 
-# variable assignments:
-PS3_HOLD="$PS3"
-PS3="Option: "
+# the select menu uses the PS3 prompt:
+PS3="Enter the number next to your choice: "
+
+# other variable assignments:
 tmpfile="$(mktemp)"
 
 
 # welcome matt:
 echo ""
-echo "Welcome $(basename ${0}) to!!!"
-echo "  I'm glad you've come to visit for."
-echo "  Dan is sorry I am you to."
+echo -e "$MESSAGE_WELCOME"
 echo ""
 
 
@@ -107,20 +128,20 @@ while [[ true ]]; do
 
     # get the filter pattern from the user:
     unset response
-    CURRENT_PROMPT_FILTER="$PROMPT_FILTER"
+    CURRENT_PROMPT_FILTER="$OPTIONS_FILTER_PROMPT"
     while [[ -z "$response" ]]; do
         read -p "$CURRENT_PROMPT_FILTER" response
-        CURRENT_PROMPT_FILTER="$PROMPT_FILTER_REPRIMAND"
+        CURRENT_PROMPT_FILTER="$OPTIONS_FILTER_PROMPT_REPRIMAND"
     done
     filter="*${response}*"
 
     # get the sort order from the user:
     echo ""
-    echo "$PROMPT_FILE_SORT"
+    echo "$OPTIONS_SORT_PROMPT"
 
-    select opt in "${!OPTIONS_FILE_SORT[@]}"; do
-        if [[ "$opt" =~ $OPTIONS_FILE_SORT_BREAK ]]; then
-            sort_key=${OPTIONS_FILE_SORT[$opt]}
+    select opt in "${!OPTIONS_SORT[@]}"; do
+        if [[ "$opt" =~ $OPTIONS_SORT_BREAK ]]; then
+            sort_key=${OPTIONS_SORT[$opt]}
             break
         else
             echo "$MESSAGE_BAD_CHOICE"
@@ -159,17 +180,16 @@ while [[ true ]]; do
             sort -k $sort_key -t "${FILENAME_DELIMITER}" "$tmpfile"
         ) | column -t -s "${FILENAME_DELIMITER}"
     else
-        echo "No matching files found."
+        echo "$MESSAGE_NO_FILES_FOUND"
     fi
 
     echo ""
-    echo "$PROMPT_CONTINUE"
+    echo "$OPTIONS_CONTINUE_PROMPT"
 
     select opt in ${OPTIONS_YESNO[*]}; do
         if [[ "$opt" =~ $OPTIONS_YESNO_BREAK ]]; then
             break
         elif [[ "$opt" =~ $OPTIONS_YESNO_EXIT ]]; then
-            set +x
             exit 0
         else
             echo "$MESSAGE_BAD_CHOICE"
@@ -180,5 +200,3 @@ done
 
 # cleanup
 rm -f "$tmpfile"
-PS3="$PS3_HOLD"
-set +x

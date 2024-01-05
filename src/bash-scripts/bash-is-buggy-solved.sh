@@ -4,14 +4,9 @@
 
     Overview:
     ---------
-    This version of my script has some bugs. Your job is to find them and fix them. To make it
-    less confusing to debug the script, I have replaced the silly prompts from my original with
-    script with plain English prompts.
+    This version of the script is simply a debugged version of bash-is-buggy.sh.
 
-    I have made this script easier to read by not using any variables. This means that all the
-    code is in one place, and you don't have to go looking for the definition of a variable
-
-    Known Bugs:
+    Known Bugs (this refers to the original bash-is-buggy.sh script, not this one):
     -----------
     Here are (at least some of) the bugs in this script.
 
@@ -48,6 +43,10 @@ end_comment
 
 # variable initialization:
 tmpfile="$(mktemp)"
+delimiter='/'
+
+# the select menu will use this prompt:
+PS3="Enter the number next to your choice: "
 
 echo ""
 echo "Welcome to $(basename ${0})! Thanks for stopping by."
@@ -57,14 +56,14 @@ echo ""
 # main program:
 while [[ true ]]; do
     unset response
-    read -p "What string should be used to filter the files? " $response
+    read -p "What string should be used to filter the files? " response
     filter="*${response}*"
 
     # prompt for filter string:
     echo ""
     echo "Which field should be used to sort the files? "
 
-    select opt in Filename Filename Length Filename Vowel Count; do
+    select opt in "Filename" "Filename Length" "Filename Vowel Count"; do
         echo "$opt"
         if [[ "$opt" =~ (Filename|Filename Length|Filename Vowel Count) ]]; then
             break
@@ -74,6 +73,20 @@ while [[ true ]]; do
     done
     echo ""
 
+    if [[ "$opt" == "Filename" ]]; then
+        sort_key="1"
+    elif [[ "$opt" == "Filename Length" ]]; then
+        sort_key="2h"
+    elif [[ "$opt" == "Filename Vowel Count" ]]; then
+        sort_key="3h"
+    else
+        msg=$(fortune)
+        msg+="\n\n"
+        msg+="This section of code should not be reachable. Exiting."
+        echo -e $msg >&2
+        exit 1
+    fi
+    echo $sort_key "<<<----"
     # find files matching filter:
     files=$(find . -maxdepth 1 -type f -iname "$filter")
 
@@ -82,30 +95,18 @@ while [[ true ]]; do
         # remove $tmpfile so it doesn't grow during each user loop:
         rm -f $tmpfile
         echo -e "$files" | while read -r file; do
-            vowel_count=$(echo "$file" | grep -io '[aeiou]' | wc --lines)
-            filename_length=${#file}
-            echo "$file$ $filename_length $vowel_count" >> "$tmpfile"
+            basename=$(basename "$file")
+            vowel_count=$(echo "$basename" | grep -io '[aeiou]' | wc --lines)
+            basename_length=${#basename}
+            echo "${basename}${delimiter}${basename_length}${delimiter}${vowel_count}" >> "$tmpfile"
         done
 
-        if [[ "$opt" == "Filename" ]]; then
-            sort_key="1"
-        elif [[ "$opt" == "FilenameLength" ]]; then
-            sort_key="2h"
-        elif [[ "$opt" == "FilenameVowelCount" ]]; then
-            sort_key="3h"
-        else
-            msg=$(fortune)
-            msg+="\n\n"
-            msg+="This section of code should not be reachable. Exiting."
-            echo -e $msg >&2
-            exit 1
-        fi
 
         (
-            echo "Filename FilenameLength FilenameVowelCount";
-            echo "-------- -------------- ------------------";
-            sort -k $sort_key -t " " "$tmpfile"
-        ) | column -t -s " "
+            echo "Filename${delimiter}FilenameLength${delimiter}FilenameVowelCount";
+            echo "--------${delimiter}--------------${delimiter}------------------";
+            sort -k $sort_key -t "${delimiter}" "$tmpfile"
+        ) | column -t -s "${delimiter}"
     else
         echo "No matching files found."
     fi
