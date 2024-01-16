@@ -13,15 +13,15 @@ while ($true) {
         }
     }
 
-    Remove-Variable response 2>$null
     Write-Output ""
     Write-Output "What field should be used to sort the data?"
     Write-Output ""
-
+    
     Write-Output "F - Filename"
     Write-Output "L - Filename Length"
     Write-Output "V - Filename Vowel Count"
-
+    
+    Remove-Variable response 2>$null
     Write-Output ""
     while ($true) {
         $response = $(Read-Host -Prompt "Please enter the letter of your choice from the list above ")
