@@ -1,30 +1,27 @@
 <#
-.SYNOPSIS
+    .SYNOPSIS
     Retrieves a list of files based on specified filter criteria and sorts them based on a user-specified property.
 
-.DESCRIPTION
+    .DESCRIPTION
     The Get-FileList function retrieves a list of files based on the specified filter criteria and sorts them based on the specified property. It returns a custom object containing the file name, name length, and the number of vowels in the file name for each file.
 
-.PARAMETER SortProperty
+    .PARAMETER SortProperty
     Specifies the property by which the files should be sorted. Valid values are "FileName", "NameLength", and "VowelCount". The default value is "FileName".
 
-.PARAMETER Filter
+    .PARAMETER Filter
     Specifies the filter criteria for selecting files. The default value is "*".
 
-.OUTPUTS
+    .OUTPUTS
     System.Object
-        Returns a custom object containing the file name, name length, and number of vowels in the file name for each file.
+    Returns a custom object containing the file name, name length, and number of vowels in the file name for each file.
 
-.EXAMPLE
+    .EXAMPLE
     Get-FileList -SortProperty "NameLength" -Filter "*.txt"
     Retrieves a list of files with the extension ".txt", sorts them based on the name length, and displays the results.
 
-.EXAMPLE
+    .EXAMPLE
     Get-FileList -Filter "test" -SortProperty "VowelCount"
     Retrieves a list of files containing the word "test" in their name, sorts them based on the vowel count, and displays the results.
-
-.LINK
-    https://github.com/sql-sith/cdc-2024
 #>
 
 
@@ -68,10 +65,10 @@ Function Get-FileList {
         }
     }
 
-    if ($files.Count -eq 0) {
-        Write-Output "No files found matching the filter `"$Filter`""
-    }
-    else {
-        $files | Sort-Object -Property $SortProperty
-    }
+    # if ($files.Count -eq 0) {
+    #     Write-Output "No files found matching the filter `"$Filter`""
+    # }
+    # else {
+    $files | Sort-Object -Property $SortProperty
+    # }
 }

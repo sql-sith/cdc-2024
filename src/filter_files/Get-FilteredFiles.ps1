@@ -16,11 +16,11 @@ while ($true) {
     Write-Output ""
     Write-Output "What field should be used to sort the data?"
     Write-Output ""
-    
+
     Write-Output "F - Filename"
     Write-Output "L - Filename Length"
     Write-Output "V - Filename Vowel Count"
-    
+
     Remove-Variable response 2>$null
     Write-Output ""
     while ($true) {
