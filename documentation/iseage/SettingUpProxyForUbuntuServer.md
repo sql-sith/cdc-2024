@@ -1,9 +1,9 @@
 # Connecting to the outside world from ISEAGE
 
-> Instructions written by Aksel Rasmussen on 2023-10-14
-> Last updated by Aksel Rasmussen on 2023-10-21 at 11:44
+> Created by Aksel Rasmussen on 2023-10-14
+> Last updated by Aksel Rasmussen on 2024-02-21 at 14:43
 
-> NOTE: These instructions are for use with a fresh ubuntu server with no modifications.
+> NOTE: These instructions are for use with an unmodified install of Ubuntu Server.
 > If you have any issues outside of that, that's your fault.
 
 1) Open `/etc/netplan/00-installer-config.yml`
@@ -19,22 +19,32 @@
 	    addresses: [144.76.90.254]
 	```
 	> Replace `{num}` with a unique number from `1` to `253`.
-3) Exit the file.
-4) Add the following lines to the end of `/etc/profile`:
+3) Add the following lines to the end of `/etc/profile`:
 	```sh
 	export http_proxy=http://199.100.16.100:3128
 	export https_proxy=http://199.100.16.100:3128
 	export ftp_proxy=http://199.100.16.100:3128
 	```
-5) Set `/etc/apt/apt.conf`'s contents to the following:
+4) Set `/etc/apt/apt.conf`'s contents to the following:
 	```
 	Acquire::http::Proxy "http://199.100.16.100:3128";
 	Acquire::https::Proxy "http://199.100.16.100:3128";
 	```
-6) Run `sudo netplan apply`
+5) Run `sudo netplan apply`
+6) Append the following to `/etc/wgetrc`:
+	```
+	use_proxy=yes
+	http_proxy=199.100.16.100:3128
+	https_proxy=199.100.16.100:3128
+	```
 7) Restart the machine
-8) `apt` and `curl` should now be working.
-	Verify this by running `sudo apt update` and `curl google.com` respectively.
+8) `apt`, `curl` and `wget` should now be working.  
+	Verify this by running the following:
+	| Program to Test | Command to Run                           |
+	|:---------------:|------------------------------------------|
+	|      `apt`      | `sudo apt update && sudo apt upgrade -y` |
+	|     `curl`      | `curl google.com`                        |
+	|     `wget`      | `wget google.com`                        |
 
 > Currently known issues:
 > - `dig` isn't working
