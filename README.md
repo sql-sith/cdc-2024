@@ -32,4 +32,8 @@ In addition to this GitHub site, we will be using a few other resources this yea
 
 - [Our YouTube Channel](https://youtube.com/@cyberdefenseclub) will have videos of some of our meetings plus an occasional bonus video, usually considering of me successfully completing a previously failed demonstration. I used to cut out some of the mistakes and dread air but that takes a long time. Since then, we've agreed that it's better to just get the recordings out there in their butt-ugly glory so that YouTube can create a transcript, because you can search the transcript and use it to jump to the part of the video you want.
 
-I am a little disappointed that the meeting I made a full soundtrack for was snubbed when Oscar nominations rolled around. The outro sequence was possibly the best thing in the history of things. In a fit of protest, I've used the silent film genre for a more recent bonus video, but without a soundtrack.
+## Personal Vibe Diary
+
+I am a little disappointed that the meeting I made a full soundtrack for was snubbed when Oscar nominations rolled around. The outro sequence was possibly the best thing in the history of things. 
+
+In a fit of protest, I've used the silent film genre for a more recent bonus video, but without the typical accompanying soundtrack. Take that, AMPAS.
