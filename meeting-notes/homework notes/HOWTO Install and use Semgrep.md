@@ -39,13 +39,8 @@ Resolving deltas: 100% (101425/101425), done.
 
 ## Scan the Repo
 
-Now you can use semgrep to scan the repository. Start by changing directories to the location of the code you want to scan. THis isn't necessary, but it simplifies the command lines we will look at.
+Now you can use semgrep to scan the repository. Start by changing directories to the location of the code you want to scan. THis isn't necessary, but it simplifies the command line a little bit.
 
-The following invocacation of Semgrep uses the following parameters:
-
-- **--config auto**  
-- **--max-target-bytes 0**
-- **--verbose**
 
 ```plaintext
 # simple semgrep scan of current directory tree:
