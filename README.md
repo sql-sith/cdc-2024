@@ -37,3 +37,6 @@ In addition to this GitHub site, we will be using a few other resources this yea
 I am a little disappointed that the meeting I made a full soundtrack for was snubbed when Oscar nominations rolled around. The outro sequence was possibly the best thing in the history of things. 
 
 In a fit of protest, I've used the silent film genre for a more recent bonus video, but without the typical accompanying soundtrack. Take that, AMPAS.
+
+
+We love github
