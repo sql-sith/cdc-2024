@@ -29,7 +29,14 @@ python diffie_hellman_refactored.py
 python diffie_hellman_refactored_gmpy.py
 ```
 
-Python 3.10.4+ required. Platform-specific gmpy2 wheels are pre-vendored in `src/diffie_hellman/vendor/` for Windows and Linux.
+Platform-specific gmpy2 wheels are pre-vendored in `src/diffie_hellman/vendor/`. The supported combinations are:
+
+| Platform | Architecture | Python version |
+|----------|-------------|----------------|
+| Windows  | AMD64       | 3.13           |
+| Linux    | x86\_64     | 3.10           |
+
+On other OS/architecture/Python-version combinations, `gmpy2` will not be installed from this file (the `gmpy`-backed scripts require it).
 
 ### Bash / Shell scripts
 
