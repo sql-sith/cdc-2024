@@ -18,7 +18,7 @@
        sends A to Bob. Eve observes A.
        - In this python script the secret number a will be called
          private_key_a and the number A will be called public_key_a.
-    3. Bob chooses a secret number b and calculates B = (g^b) mod b and
+    3. Bob chooses a secret number b and calculates B = (g^b) mod p and
        sends B to Alice. Eve observes B.
        - In this python script the secret number b will be called
          private_key_b and the number B will be called public_key_b.
@@ -34,8 +34,9 @@
 """
 # endregion
 # region imports
-import random
-from gmpy2 import mpz, powmod, random_state, log2, mpz_rrandomb
+import secrets
+from typing import Any
+from gmpy2 import mpz, powmod, random_state, log2, mpz_urandomb
 # endregion
 
 
@@ -47,6 +48,7 @@ from gmpy2 import mpz, powmod, random_state, log2, mpz_rrandomb
 PRIME: int = 0xFFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD129024E088A67CC74020BBEA63B139B22514A08798E3404DDEF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245E485B576625E7EC6F44C42E9A637ED6B0BFF5CB6F406B7EDEE386BFB5A899FA5AE9F24117C4B1FE649286651ECE45B3DC2007CB8A163BF0598DA48361C55D39A69163FA8FD24CF5F83655D23DCA3AD961C62F356208552BB9ED529077096966D670C354E4ABC9804F1746C08CA18217C32905E462E36CE3BE39E772C180E86039B2783A2EC07A28FB5C55DF06F4C52C9DE2BCBF6955817183995497CEA956AE515D2261898FA051015728E5A8AACAA68FFFFFFFFFFFFFFFF  # noqa
 GENERATOR: int = 2
 PRIVATE_KEY_BIT_LENGTH: int = 2048
+SEED_BIT_LENGTH: int = 256
 # endregion
 
 
@@ -55,16 +57,17 @@ class Person(object):
     _partner_name: str
     _data: dict
 
-    def __init__(self, name, partner_name):
+    def __init__(self, name: str, partner_name: str):
         self._name = name
         self._partner_name = partner_name
         self._data = {}
 
-    def store_data(self, key: str, value: any) -> None:
+    def store_data(self, key: str, value: Any, announce: bool = True) -> None:
         self._data[key] = value
-        print(f"{self._name} has learned the value of {key}.")
+        if announce:
+            print(f"{self._name} has learned the value of {key}.")
 
-    def get_data(self, key: str) -> any:
+    def get_data(self, key: str) -> Any:
         return self._data[key]
 
     def get_name(self) -> str:
@@ -81,33 +84,35 @@ class Person(object):
 
 
 def generate_private_key(key_length: int = PRIVATE_KEY_BIT_LENGTH) -> mpz:
-    rs = random_state(random.randint(1, key_length))
-    return mpz_rrandomb(rs, key_length)
+    rs = random_state(secrets.randbits(SEED_BIT_LENGTH))
+    return mpz_urandomb(rs, key_length)
 
 
 def generate_public_key(g: int, p: int, private_key: mpz) -> mpz:
     return powmod(g, private_key, p)
 
 
-def calculate_secret(public_key: int, private_key: int, prime: int):
-    # return public_key ** private_key % prime
+def calculate_secret(public_key: int, private_key: int, prime: int) -> mpz:
     return powmod(public_key, private_key, prime)
 
 
-def tell_everyone(key: str, value: any) -> None:
+def tell_everyone(persons: list[Person], key: str, value: Any, sender: Person | None = None) -> None:
     print(f"\nPublicly announcing the value of {key}.")
     for person in persons:
-        print(f"Telling {person.get_name()} the value of {key}.")
-        person.store_data(key, value)
+        if person is sender:
+            person.store_data(key, value, announce=False)
+        else:
+            print(f"Telling {person.get_name()} the value of {key}.")
+            person.store_data(key, value)
     print("")
 
 
-def show_what_everyone_knows() -> None:
+def show_what_everyone_knows(persons: list[Person]) -> None:
     for person in persons:
         person.tell_all()
 
 
-def alice_chooses_g_and_p():
+def alice_chooses_g_and_p(alice: Person, persons: list[Person]) -> None:
     p = PRIME
     g = GENERATOR
 
@@ -117,79 +122,56 @@ def alice_chooses_g_and_p():
     print("")
     print(f"The size of the the prime is {log2(p)} bits.")
 
-    # share these values publicly:
-    tell_everyone("g", g)
-    tell_everyone("p", p)
+    tell_everyone(persons, "g", g, sender=alice)
+    tell_everyone(persons, "p", p, sender=alice)
 
 
-def alice_chooses_private_key_a_and_calculates_public_key_a():
-    private_key_a = generate_private_key()
-    alice.store_data("private_key_a", private_key_a)
-    print(f"\nAlice has chosen private key {private_key_a}.")
-    print(f"The size of this private key is {log2(private_key_a)} bits.")
-    g = alice.get_data("g")
-    p = alice.get_data("p")
+def generate_and_share_keypair(person: Person, persons: list[Person], suffix: str) -> None:
+    private_key = generate_private_key()
+    private_key_name = f"private_key_{suffix}"
+    public_key_name = f"public_key_{suffix}"
 
-    public_key_a = generate_public_key(g, p, private_key_a)
-    print(f"\nAlice has generated public key {public_key_a}.")
-    print(f"The size of this public key is {log2(public_key_a)} bits.")
-    tell_everyone("public_key_a", public_key_a)
+    person.store_data(private_key_name, private_key, announce=False)
+    print(f"\n{person.get_name()} has chosen private key {private_key}.")
+    print(f"The size of this private key is {log2(private_key)} bits.")
 
+    g = person.get_data("g")
+    p = person.get_data("p")
 
-def bob_chooses_private_key_b_and_calculates_public_key_b():
-    private_key_b = generate_private_key()
-    bob.store_data("private_key_b", private_key_b)
-    print(f"\nBob has chosen private key {private_key_b}.")
-    print(f"The size of this private key is {log2(private_key_b)} bits.")
-
-    g = bob.get_data("g")
-    p = bob.get_data("p")
-
-    # public_key_b = mp_float(g ** private_key_b) % mp_float(p)
-    public_key_b = generate_public_key(g, p, private_key_b)
-    print(f"\nBob has generated public key {public_key_b}.")
-    print(f"The size of this public key is {log2(public_key_b)} bits.")
-    tell_everyone("public_key_b", public_key_b)
+    public_key = generate_public_key(g, p, private_key)
+    print(f"\n{person.get_name()} has generated public key {public_key}.")
+    print(f"The size of this public key is {log2(public_key)} bits.")
+    tell_everyone(persons, public_key_name, public_key, sender=person)
 
 
-def alice_calculates_the_shared_secret():
+def compute_shared_secret(person: Person, own_suffix: str, partner_suffix: str) -> None:
     secret = calculate_secret(
-        alice.get_data("public_key_b"),
-        alice.get_data("private_key_a"),
-        alice.get_data("p")
+        person.get_data(f"public_key_{partner_suffix}"),
+        person.get_data(f"private_key_{own_suffix}"),
+        person.get_data("p")
     )
 
-    alice.store_data("secret", secret)
+    person.store_data("secret", secret)
 
 
-def bob_calculates_the_shared_secret():
-    secret = calculate_secret(
-        bob.get_data("public_key_a"),
-        bob.get_data("private_key_b"),
-        bob.get_data("p")
-    )
-
-    bob.store_data("secret", secret)
-
-
-def eve_is_so_like_whatever():
+def eve_is_so_like_whatever(eve: Person) -> None:
     eve.store_data("her own self-esteem", "fully and permanently destroyed")
 
 
-def show_succinct_report():
+def show_succinct_report(alice: Person, bob: Person) -> None:
+    alice_secret = alice.get_data('secret')
+    bob_secret = bob.get_data('secret')
+
     print("")
     print("BOTTOM LINE:")
     print("------------")
     print("Did Alice and Bob generate the same key?")
     print("")
-    print(f"Alice's secret: {alice.get_data('secret')}.")
-    print(f"Bob's secret:   {bob.get_data('secret')}.")
-
-    secret_difference = alice.get_data('secret') - bob.get_data('secret')
-    print(f"Alice's secret minus Bob's secret: {secret_difference}.")
+    print(f"Alice's secret: {alice_secret}.")
+    print(f"Bob's secret:   {bob_secret}.")
     print("")
 
-    if secret_difference == 0:
+    if alice_secret == bob_secret:
         print("Yep, they did.")
     else:
         print("No, they did not! This will be reported to my parole officer.")
@@ -203,11 +185,11 @@ if __name__ == "__main__":
     eve = Person(name="Eve", partner_name="Slender Man")
     persons = [alice, bob, eve]
 
-    alice_chooses_g_and_p()
-    alice_chooses_private_key_a_and_calculates_public_key_a()
-    bob_chooses_private_key_b_and_calculates_public_key_b()
-    alice_calculates_the_shared_secret()
-    bob_calculates_the_shared_secret()
-    eve_is_so_like_whatever()
-    show_what_everyone_knows()
-    show_succinct_report()
+    alice_chooses_g_and_p(alice, persons)
+    generate_and_share_keypair(alice, persons, "a")
+    generate_and_share_keypair(bob, persons, "b")
+    compute_shared_secret(alice, own_suffix="a", partner_suffix="b")
+    compute_shared_secret(bob, own_suffix="b", partner_suffix="a")
+    eve_is_so_like_whatever(eve)
+    show_what_everyone_knows(persons)
+    show_succinct_report(alice, bob)
