@@ -11,31 +11,31 @@
 
     Protocol outline:
 
-    1. Alice chooses g and p and sends them to Bob. Eve observes g and p.
-       - They are called g and p, by the way, because you try to pick a
-         value for p that is a huge prime number, and a value for g that
-         can generate secrets that have mathematically desirable random
-         attributes.
-       - Selection of such g/p pairs is difficult, so some are actually
-         published and people are encouraged to use them. It sounds crazy,
-         but it works if your private keys are random and large.
-    2. Alice chooses a secret number a and calculates A = (g^a) mod p and
-       sends A to Bob. Eve observes A.
-       - In this python script the secret number a will be called
-         private_key_a and the number A will be called public_key_a.
-    3. Bob chooses a secret number b and calculates B = (g^b) mod p and
-       sends B to Alice. Eve observes B.
-       - In this python script the secret number b will be called
-         private_key_b and the number B will be called public_key_b.
-    4. Alice calculates key = (B^a) mod p.
-       - This is the shared secret that she and Bob will use to begin
-         encrypting their communication.
-       - In this python script, this shared secret will be called
-         secret.
-    5. Bob calculates key = (A^b) mod p.
-    6. The values for key calculated by Alice and Bob are identical.
-    7. Assuming Alice made good choices for g and p, it is not feasible
-       for Eve to determine the value of key quickly enough to be useful.
+    1.  Alice chooses g and p and sends them to Bob. Eve observes g and p.
+        -   They are called g and p, by the way, because you try to pick a
+            value for p that is a huge prime number, and a value for g that
+            can generate secrets that have mathematically desirable random
+            attributes.
+        -   Selection of such g/p pairs is difficult, so some are actually
+            published and people are encouraged to use them. It sounds crazy,
+            but it works if your private keys are random and large.
+    2.  Alice chooses a secret number a and calculates A = (g^a) mod p and
+        sends A to Bob. Eve observes A.
+        -   In this python script the secret number a will be called
+            private_key_a and the number A will be called public_key_a.
+    3.  Bob chooses a secret number b and calculates B = (g^b) mod p and
+        sends B to Alice. Eve observes B.
+        -   In this python script the secret number b will be called
+            private_key_b and the number B will be called public_key_b.
+    4.  Alice calculates key = (B^a) mod p.
+        -   This is the shared secret that she and Bob will use to begin
+            encrypting their communication.
+        -   In this python script, this shared secret will be called
+            secret.
+    5.  Bob calculates key = (A^b) mod p.
+    6.  The values for key calculated by Alice and Bob are identical.
+    7.  Assuming Alice made good choices for g and p, it is not feasible
+        for Eve to determine the value of key quickly enough to be useful.
 """
 # endregion
 # region imports
