@@ -27,6 +27,9 @@ python diffie_hellman_gmpy.py
 # Refactored variants follow the same pattern
 python diffie_hellman_refactored.py
 python diffie_hellman_refactored_gmpy.py
+
+# Object-oriented variant of the gmpy2 script
+python diffie_hellman_gmpy_oo.py
 ```
 
 `gmpy2>=2.2` is resolved from PyPI; pre-built wheels are available there for CPython 3.10–3.14 on Windows AMD64 and Linux x86_64. On platforms without a published wheel, pip will fall back to a source build, which requires the GMP, MPFR, and MPC C libraries.
@@ -54,10 +57,11 @@ Demonstrates the Diffie-Hellman key exchange protocol with narrative output show
 - `diffie_hellman.py` — interactive: prompts user for `p`, `g`, and each party's private key
 - `diffie_hellman_gmpy.py` — automated: uses hardcoded 2048-bit RFC 3526 group parameters and random private keys; uses `gmpy2` for fast modular exponentiation
 - `diffie_hellman_refactored*.py` — cleaner rewrites of the above two
+- `diffie_hellman_gmpy_oo.py` — object-oriented variant of the gmpy2 script: protocol verbs are methods on `Person`, `__main__` reads as a top-to-bottom transcript of the exchange
 - `diffie_hellman_idna.py` — variant exploring IDNA encoding
 - `calutils/strings/` — shared I/O helpers (`get_string`, `get_int`, text-box formatting)
 
-The central abstraction is the `Person` class, which tracks each participant's knowledge state. `tell_everyone()` broadcasts a value to all parties; `tell_all()` prints what a given person knows.
+The central abstraction is the `Person` class, which tracks each participant's knowledge state. In the procedural variants, module-level helpers like `tell_everyone()` operate on Person instances; in the OO variant, those helpers move onto the class as methods (`broadcast`, `generate_keypair`, `compute_shared_secret`, etc.).
 
 ### `src/filter_files/`
 
