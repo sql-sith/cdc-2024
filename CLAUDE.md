@@ -29,14 +29,7 @@ python diffie_hellman_refactored.py
 python diffie_hellman_refactored_gmpy.py
 ```
 
-Platform-specific gmpy2 wheels are pre-vendored in `src/diffie_hellman/vendor/`. The supported combinations are:
-
-| Platform | Architecture | Python version |
-|----------|-------------|----------------|
-| Windows  | AMD64       | 3.13           |
-| Linux    | x86\_64     | 3.10           |
-
-On other OS/architecture/Python-version combinations, `gmpy2` will not be installed from this file (the `gmpy`-backed scripts require it).
+`gmpy2>=2.2` is resolved from PyPI; pre-built wheels are available there for CPython 3.10–3.14 on Windows AMD64 and Linux x86_64. On platforms without a published wheel, pip will fall back to a source build, which requires the GMP, MPFR, and MPC C libraries.
 
 ### Bash / Shell scripts
 
@@ -91,7 +84,7 @@ Chronological meeting notes and homework assignments for the 2023-2024 season.
 
 `src/diffie_hellman/requirements.txt`:
 - `primePy==1.3` — primality testing
-- `gmpy2` — high-precision arithmetic (optional; pre-built wheels in `vendor/` cover Windows and Linux)
+- `gmpy2>=2.2` — high-precision arithmetic (required by the `*_gmpy.py` scripts)
 
 ## Repository Conventions
 
