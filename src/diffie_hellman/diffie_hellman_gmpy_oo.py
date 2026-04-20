@@ -58,10 +58,19 @@ SEED_BIT_LENGTH: int = 256
 
 
 def _generate_private_key(key_length: int = PRIVATE_KEY_BIT_LENGTH) -> mpz:
+    if key_length < 2:
+        raise ValueError("key_length must be at least 2 bits")
+
     rs = random_state(secrets.randbits(SEED_BIT_LENGTH))
-    return mpz_urandomb(rs, key_length)
+    upper_bound = mpz(PRIME - 1)
 
+    while True:
+        private_key = mpz_urandomb(rs, key_length - 1)
+        private_key |= mpz(1) << (key_length - 1)
+        private_key |= mpz(1)
 
+        if private_key < upper_bound:
+            return private_key
 class Person:
     def __init__(self, name: str, partner_name: str):
         self._name = name
